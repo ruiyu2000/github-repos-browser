@@ -1,96 +1,87 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      persistent
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      v-model="drawer"
-      enable-resize-watcher
-      fixed
-      app
-    >
-      <v-list>
-        <v-list-tile
-          value="true"
-          v-for="(item, i) in items"
-          :key="i"
-        >
-          <v-list-tile-action>
-            <v-icon v-html="item.icon"></v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title v-text="item.title"></v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-    </v-navigation-drawer>
-    <v-toolbar
-      app
-      :clipped-left="clipped"
-    >
-      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-btn icon @click.stop="miniVariant = !miniVariant">
-        <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="clipped = !clipped">
-        <v-icon>web</v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="fixed = !fixed">
-        <v-icon>remove</v-icon>
-      </v-btn>
-      <v-toolbar-title v-text="title"></v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn icon @click.stop="rightDrawer = !rightDrawer">
-        <v-icon>menu</v-icon>
-      </v-btn>
+    <v-toolbar dark color="blue">
+      <v-toolbar-title>GitHub Top 100 JavaScript Repositories</v-toolbar-title>
     </v-toolbar>
-    <v-content>
-      <HelloWorld/>
-    </v-content>
-    <v-navigation-drawer
-      temporary
-      :right="right"
-      v-model="rightDrawer"
-      fixed
-      app
-    >
-      <v-list>
-        <v-list-tile @click="right = !right">
-          <v-list-tile-action>
-            <v-icon>compare_arrows</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
-        </v-list-tile>
-      </v-list>
-    </v-navigation-drawer>
-    <v-footer :fixed="fixed" app>
-      <span>&copy; 2017</span>
-    </v-footer>
+    <div v-if="loading" class="centered">
+      <v-progress-circular indeterminate size="60" color="blue"></v-progress-circular>
+    </div>
+    <v-list v-if="!loading" class="list elevation-3" two-line>
+      <list-item :item="headers"></list-item>
+      <template v-for="item in getItems()">
+        <list-item :key="item.id" :item="item"></list-item>
+      </template>
+    </v-list>
+    <div v-if="!loading" class="text-xs-center pt-3 pb-4">
+      <v-pagination v-model="pagination.page" :length="pages" />
+    </div>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
+import {BACKEND} from './backend'
+import ListItem from './components/ListItem';
 
 export default {
+  name: 'App',
+
+  components: {
+    ListItem
+  },
+
   data() {
     return {
-      clipped: false,
-      drawer: true,
-      fixed: false,
-      items: [{
-        icon: 'bubble_chart',
-        title: 'Inspire'
-      }],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'Vuetify.js'
+      headers: {
+        owner: {avatar_url: false},
+        name: 'Repository',
+        description: 'Description',
+        stargazers_count: 'Stars',
+        forks_count: 'Forks'
+      },
+      items: [],
+      pagination: {page: 1, rowsPerPage: 20},
+      loading: true,
     }
   },
-  name: 'App',
-  components: {
-    HelloWorld
+
+  computed: {
+    pages () {
+      return Math.ceil(this.items.length / this.pagination.rowsPerPage)
+    }
+  },
+
+  methods: {
+    getItems: function (page) {
+      let start = this.pagination.rowsPerPage * (this.pagination.page - 1) 
+      let end = this.pagination.rowsPerPage * this.pagination.page
+      return this.items.slice(start, end)
+    },
+  },
+  
+  created() {
+    BACKEND.get('search/repositories?q=language:javascript&sort=stars&order=desc&per_page=100')
+    .then(res => {
+      this.items = res.data.items
+      this.loading = false
+    })
+    .catch(e => {
+      console.log(e)
+      this.loading = false
+    })
   }
 }
 </script>
+
+<style lang="scss">
+.list {
+  max-width: 1200px;
+  margin: 0 auto;
+
+}
+
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+</style>
