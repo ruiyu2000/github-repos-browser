@@ -31,16 +31,16 @@ export default {
 
   data() {
     return {
+      items: [],
+      loading: true,
+      pagination: {page: 1, rowsPerPage: 20},
       headers: {
-        owner: {avatar_url: false},
+        owner: false,
         name: 'Repository',
         description: 'Description',
         stargazers_count: 'Stars',
         forks_count: 'Forks'
       },
-      items: [],
-      pagination: {page: 1, rowsPerPage: 20},
-      loading: true,
     }
   },
 
@@ -76,7 +76,7 @@ export default {
 .list {
   max-width: 1200px;
   margin: 0 auto;
-
+  padding-bottom: 0;
 }
 
 .centered {
