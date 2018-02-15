@@ -13,7 +13,8 @@
       </template>
     </v-list>
     <div v-if="!loading" class="text-xs-center pt-3 pb-4">
-      <v-pagination v-model="pagination.page" :length="pages" />
+      <!-- <v-pagination v-model="pagination.page" :length="pages" /> -->
+      <pagination :pagination="pagination" :length="items.length"></pagination>
     </div>
   </v-app>
 </template>
@@ -21,12 +22,13 @@
 <script>
 import {BACKEND} from './backend'
 import ListItem from './components/ListItem';
+import Pagination from './components/Pagination';
 
 export default {
   name: 'App',
 
   components: {
-    ListItem
+    ListItem, Pagination
   },
 
   data() {
@@ -52,8 +54,24 @@ export default {
 
   methods: {
     getItems: function (page) {
+
+      if (this.pagination.page == this.items.length / this.pagination.rowsPerPage) {
+        BACKEND.get('search/repositories?q=language:javascript&sort=stars&order=desc&per_page=100&page='+parseInt(100/(5*this.pagination.rowsPerPage)+1))
+        .then(res => {
+          this.items = this.items.concat(res.data.items)
+        })
+        .catch(e => {
+          console.log(e)
+        })
+      }
+
+      window.onhashchange = (e) => {
+        let re = /#(.*)/
+        this.pagination.page = parseInt(e.newURL.match(re)[1])
+      }
       let start = this.pagination.rowsPerPage * (this.pagination.page - 1) 
       let end = this.pagination.rowsPerPage * this.pagination.page
+      window.location.hash = '#'+this.pagination.page
       return this.items.slice(start, end)
     },
   },
@@ -68,6 +86,9 @@ export default {
       console.log(e)
       this.loading = false
     })
+
+    let re = /#(.*)/
+    this.pagination.page = parseInt(window.location.href.match(re)[1])
   }
 }
 </script>
