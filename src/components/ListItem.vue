@@ -1,17 +1,24 @@
 <template>
-  <a class="list-item" :href="item.html_url" target="_blank">
-    <div class="image"><img v-if="item.owner" :src="item.owner.avatar_url"></div>
-    <div class="name">{{ item.name }}</div>
-    <div class="desc">{{ item.description }}</div>
-    <div class="star text-xs-right">{{ item.stargazers_count }}</div>
-    <div class="fork text-xs-right">{{ item.forks_count }}</div>
+  <a class="list-item" :href="url" target="_blank">
+    <div class="image" :style="{backgroundSize: 'contain', backgroundImage: 'url('+image+')'}"></div>
+    <div class="name">{{ name }}</div>
+    <div class="desc">{{ description }}</div>
+    <div class="star text-xs-right">{{ stars }}</div>
+    <div class="fork text-xs-right">{{ forks }}</div>
   </a>
 </template>
 
 <script>
 export default {
   name: 'list-item',
-  props: ['item'],
+  props: {
+    url: String,
+    image: String,
+    name: String,
+    description: String,
+    stars: Number,
+    forks: Number
+  }
 }
 </script>
 
@@ -24,7 +31,7 @@ export default {
   grid-column-gap: 15px;
   grid-row-gap: 15px;
   min-height: 40px;
-  padding: 10px 30px 5px 20px;
+  padding: 5px 30px 5px 20px;
   border-bottom: lightgray;
   border-bottom-style: solid;
   border-width: 1px;
@@ -58,10 +65,10 @@ export default {
     border: none;
   }
   
-  img {
+  .image {
     width: 50px;
     height: 50px;
-    border-radius: 25px;
+    border-radius: 5px;
   }
 
   .name {

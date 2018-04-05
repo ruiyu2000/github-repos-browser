@@ -9,7 +9,6 @@ export default {
   name: 'pagination',
   props: ['length', 'pagination'],
 
-
   computed: {
     pages () {
       let pages = []
@@ -17,7 +16,6 @@ export default {
       if (this.pagination.page > 3) {
         for (let i = this.pagination.page - 2; i < this.pagination.page + 3; i++) {
           pages.push(i)
-          console.log(i);
         }
       }
       pages.push(this.length / this.pagination.rowsPerPage)
@@ -25,13 +23,10 @@ export default {
       let res = pages.filter(function(item, pos, self) {
         return self.indexOf(item) == pos
       })
-console.log(res);
-
 
       return res
     }
   },
-
 }
 </script>
 
