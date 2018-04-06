@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-toolbar dark>
-      <div class="toolbar-title">
+      <div class="toolbar-content">
         <div>GitHub</div>
         <v-select
           class="toolbar-languages"
@@ -129,7 +129,7 @@ export default {
   left: 50%;
 }
 
-.toolbar-title {
+.toolbar-content {
   display: flex;
   align-items: center;
   width: 100%;
@@ -138,6 +138,14 @@ export default {
   padding: 0 16px;
   font-size: 19px;
   font-weight: 500;
+
+  &:before {
+    position: relative;
+    left: 4px;
+    top: 2px;
+    padding-right: 16px;
+    content: url('./assets/octicon.svg');
+  }
 }
 
 .toolbar-languages {
