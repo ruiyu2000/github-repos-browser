@@ -16,8 +16,8 @@ export default {
     image: String,
     name: String,
     description: String,
-    stars: Number,
-    forks: Number
+    stars: [Number, String],
+    forks: [Number, String]
   }
 }
 </script>
@@ -30,7 +30,6 @@ export default {
   grid-template-areas: "image name desc stars forks";
   grid-column-gap: 15px;
   grid-row-gap: 15px;
-  min-height: 40px;
   padding: 5px 30px 5px 20px;
   border-bottom: lightgray;
   border-bottom-style: solid;
@@ -38,7 +37,9 @@ export default {
   color: #333;
   text-decoration: none;
   transition: background-color 200ms ease;
-
+  @media (min-width: 992px) {
+    grid-template-rows: 45px;
+  }
   @media (max-width: 991px) {
     grid-template-areas:
       "image name stars forks"
@@ -66,13 +67,24 @@ export default {
   }
   
   .image {
-    width: 50px;
-    height: 50px;
-    border-radius: 5px;
+    width: 45px;
+    height: 45px;
+    border-radius: 3px;
   }
 
   .name {
     font-weight: 500;
+  }
+
+  .desc {
+    max-height: 100%;
+    @media (min-width: 992px) {
+      overflow-y: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
   }
 
   .star, .fork {

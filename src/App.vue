@@ -1,10 +1,18 @@
 <template>
   <v-app>
-    <v-toolbar dark color="blue">
-      <v-toolbar-title>GitHub Top 100 JavaScript Repositories</v-toolbar-title>
+    <v-toolbar dark>
+      <div class="toolbar-title">
+        <div>GitHub</div>
+        <v-select
+          class="toolbar-languages"
+          :items="languages"
+          v-model="language"
+        />
+        <div>Repositories</div>
+      </div>
     </v-toolbar>
     <div v-if="loading" class="centered">
-      <v-progress-circular indeterminate size="60" color="blue"></v-progress-circular>
+      <v-progress-circular indeterminate size="60" color="blue" />
     </div>
     <v-list v-if="!loading" class="list elevation-3" two-line>
       <list-item
@@ -12,22 +20,21 @@
         description='Description'
         stars='Stars'
         forks='Forks'
-      ></list-item>
-      <template v-for="item in getItems">
-        <list-item
-          :key="item.id"
-          :url="item.html_url"
-          :image="item.owner.avatar_url"
-          :name="item.name"
-          :description="item.description"
-          :stars="item.stargazers_count"
-          :forks="item.forks_count"
-        />
-      </template>
+      />
+      <list-item
+        v-for="item in items"
+        :key="item.id"
+        :url="item.html_url"
+        :image="item.owner.avatar_url"
+        :name="item.name"
+        :description="item.description"
+        :stars="item.stargazers_count"
+        :forks="item.forks_count"
+      />
     </v-list>
     <div v-if="!loading" class="text-xs-center pt-3 pb-4">
-      <v-pagination v-model="pagination.page" :length="pages" :total-visible="9" />
-      <!-- <pagination :pagination="pagination" :length="items.length"></pagination> -->
+      <v-pagination v-model="page" :length="pages" :total-visible="9" />
+      <!-- < :pagination="pagination" :length="items.length" /> -->
     </div>
   </v-app>
 </template>
@@ -35,63 +42,77 @@
 <script>
 import {BACKEND} from './backend'
 import ListItem from './components/ListItem';
-import Pagination from './components/Pagination';
+// import Pagination from './components/Pagination';
 
 export default {
   name: 'App',
 
   components: {
-    ListItem, Pagination
+    ListItem
   },
 
   data() {
     return {
+      cache: [],
       items: [],
+      language: 'JavaScript',
+      languages: ['JavaScript', 'Python', 'Java', 'PHP', 'Ruby', 'C++', 'C', 'C#', 'Shell', 'HTML'],
       loading: true,
-      pagination: {page: 1, rowsPerPage: 20},
+      page: 1,
+      pages: 0,
+      rowsPerPage: 20,
     }
   },
 
-  computed: {
-    pages () {
-      return Math.ceil(this.items.length / this.pagination.rowsPerPage)
-    },
+  methods: {
+    getItems() {
 
-    getItems () {
-      if (this.pagination.page == this.items.length / this.pagination.rowsPerPage) {
-        BACKEND.get('search/repositories?q=language:javascript&sort=stars&order=desc&per_page=100&page='+parseInt(100/(5*this.pagination.rowsPerPage)+1))
-        .then(res => {
-          this.items = this.items.concat(res.data.items)
-        })
-        .catch(e => {
-          console.log(e)
-        })
+      //cache lookup
+      let inCache = true;
+      for (let i = 0; i < this.rowsPerPage; i++) {
+        if (!this.cache[this.language][i + (this.page - 1) * this.rowsPerPage]) inCache = false;
       }
-      window.onhashchange = (e) => {
-        let re = /#(.*)/
-        this.pagination.page = parseInt(e.newURL.match(re)[1]) //need conditional to go to first page if too high
+      if (inCache) {
+        this.items = this.cache[this.language].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
+        return
       }
-      let start = this.pagination.rowsPerPage * (this.pagination.page - 1) 
-      let end = this.pagination.rowsPerPage * this.pagination.page
-      window.location.hash = '#'+this.pagination.page
-      return this.items.slice(start, end)
+
+      BACKEND.get('search/repositories?q=language:'+this.language+'&sort=stars&order=desc&per_page='+this.rowsPerPage+'&page='+this.page)
+      .then(res => {
+        for (let i = 0; i < res.data.items.length; i++) {
+          this.cache[this.language][(this.page - 1) * this.rowsPerPage + i] = res.data.items[i]
+        }
+        this.items = res.data.items
+        this.pages = Math.min(100, Math.ceil(res.data.total_count / this.rowsPerPage))
+        this.loading = false
+      })
+      .catch(e => {
+        console.log(e)
+        this.loading = false
+      })
+      // window.onhashchange = (e) => {
+      //   let re = /#(.*)/
+      //   this.page = parseInt(e.newURL.match(re)[1]) //need conditional to go to first page if too high
+      // }
+      // window.location.hash = '#'+this.page
+    },
+  },
+
+  watch: {
+    page: function (val) {
+      this.getItems()
+    },
+    language: function (val) {
+      this.getItems()
     },
   },
   
   created() {
-    BACKEND.get('search/repositories?q=language:javascript&sort=stars&order=desc&per_page=100')
-    .then(res => {
-      this.items = res.data.items
-      this.loading = false
-    })
-    .catch(e => {
-      console.log(e)
-      this.loading = false
-    })
-
-    let re = /#(.*)/
-    this.pagination.page = parseInt(window.location.href.match(re)[1])
-  }
+    for (let i = 0; i < this.languages.length; i++) {
+      this.cache[this.languages[i]] = [];
+    }
+    this.getItems()
+  },
 }
 </script>
 
@@ -106,5 +127,21 @@ export default {
   position: absolute;
   top: 50%;
   left: 50%;
+}
+
+.toolbar-title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.toolbar-languages {
+  max-width: 200px;
+  margin: 0 10px;
 }
 </style>
