@@ -64,22 +64,25 @@ export default {
     getItems() {
 
       //cache lookup
-      let inCache = true;
+      let inCache = true
       for (let i = 0; i < this.rowsPerPage; i++) {
-        if (!this.cache[this.language][i + (this.page - 1) * this.rowsPerPage]) inCache = false;
+        if (!this.cache[this.language][i + (this.page - 1) * this.rowsPerPage]) inCache = false
       }
       if (inCache) {
         this.items = this.cache[this.language].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
         return
       }
 
-      BACKEND.get('search/repositories?q=language:'+this.language+'&sort=stars&order=desc&per_page='+this.rowsPerPage+'&page='+this.page)
+      //cache a few pages ahead
+      BACKEND.get('search/repositories?q=language:'+this.language+'&sort=stars&order=desc&per_page='+(this.rowsPerPage * 3)+'&page='+(this.page + 2) / 3)
       .then(res => {
         for (let i = 0; i < res.data.items.length; i++) {
           this.cache[this.language][(this.page - 1) * this.rowsPerPage + i] = res.data.items[i]
         }
-        this.items = res.data.items
+        this.items = this.cache[this.language].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
         this.pages = Math.min(100, Math.ceil(res.data.total_count / this.rowsPerPage))
+
+        //change loading spinner to show for all loading
         this.loading = false
       })
       .catch(e => {
@@ -95,17 +98,17 @@ export default {
   },
 
   watch: {
-    page: function (val) {
+    page: function(val) {
       this.getItems()
     },
-    language: function (val) {
+    language: function(val) {
       this.getItems()
     },
   },
   
   created() {
     for (let i = 0; i < this.languages.length; i++) {
-      this.cache[this.languages[i]] = [];
+      this.cache[this.languages[i]] = [] //create separate cache arrays for each language
     }
     this.getItems()
   },
