@@ -1,16 +1,10 @@
 <template>
   <v-app>
-    <v-toolbar dark>
-      <div class="toolbar-content">
-        <div>GitHub</div>
-        <v-select
-          class="toolbar-languages"
-          :items="languages"
-          v-model="language"
-        />
-        <div>Repositories</div>
-      </div>
-    </v-toolbar>
+    <nav-bar :language="language" :languages="languages">
+      <select slot="language" v-model="language">
+        <option v-for="lang in languages" :key="lang" :value="lang">{{ lang }}</option>
+      </select>
+    </nav-bar>
     <div v-if="loading" class="centered">
       <v-progress-circular indeterminate size="60" color="blue" />
     </div>
@@ -39,8 +33,10 @@
   </v-app>
 </template>
 
+
 <script>
 import {BACKEND} from './backend'
+import NavBar from './components/NavBar';
 import ListItem from './components/ListItem';
 // import Pagination from './components/Pagination';
 
@@ -48,7 +44,7 @@ export default {
   name: 'App',
 
   components: {
-    ListItem
+    NavBar, ListItem
   },
 
   data() {
@@ -116,40 +112,17 @@ export default {
 }
 </script>
 
-<style lang="scss">
+
+<style lang="scss" scoped>
 .list {
   max-width: 1200px;
   margin: 0 auto;
-  padding-bottom: 0;
+  padding: 0;
 }
 
 .centered {
   position: absolute;
   top: 50%;
   left: 50%;
-}
-
-.toolbar-content {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 16px;
-  font-size: 19px;
-  font-weight: 500;
-
-  &:before {
-    position: relative;
-    left: 4px;
-    top: 2px;
-    padding-right: 16px;
-    content: url('./assets/octicon.svg');
-  }
-}
-
-.toolbar-languages {
-  max-width: 200px;
-  margin: 0 10px;
 }
 </style>

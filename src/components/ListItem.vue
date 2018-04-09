@@ -8,6 +8,7 @@
   </a>
 </template>
 
+
 <script>
 export default {
   name: 'list-item',
@@ -21,6 +22,7 @@ export default {
   }
 }
 </script>
+
 
 <style lang="scss" scoped>
 .list-item {
@@ -38,7 +40,7 @@ export default {
   text-decoration: none;
   transition: background-color 200ms ease;
   @media (min-width: 992px) {
-    grid-template-rows: 45px;
+    grid-template-rows: 46px;
   }
   @media (max-width: 991px) {
     grid-template-areas:

@@ -4,6 +4,7 @@
   </div>
 </template>
 
+
 <script>
 export default {
   name: 'pagination',
@@ -29,6 +30,7 @@ export default {
   },
 }
 </script>
+
 
 <style lang="scss" scoped>
 
