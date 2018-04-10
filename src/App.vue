@@ -8,7 +8,11 @@
     <div v-if="loading" class="centered">
       <v-progress-circular indeterminate size="60" color="blue" />
     </div>
-    <v-list v-if="!loading" class="list elevation-3" two-line>
+    <v-list
+      v-if="items.length"
+      :class="{list: true, loading: loading, 'elevation-3': true}"
+      two-line
+    >
       <list-item
         name='Repository'
         description='Description'
@@ -26,8 +30,8 @@
         :forks="item.forks_count"
       />
     </v-list>
-    <div v-if="!loading" class="text-xs-center pt-3 pb-4">
-      <v-pagination v-model="page" :length="pages" :total-visible="9" />
+    <div v-if="pages" class="text-xs-center pt-3 pb-4">
+      <v-pagination v-model="page" :length="pages" :total-visible="11" />
       <!-- < :pagination="pagination" :length="items.length" /> -->
     </div>
   </v-app>
@@ -62,7 +66,6 @@ export default {
 
   methods: {
     getItems() {
-
       //cache lookup
       let inCache = true
       for (let i = 0; i < this.rowsPerPage; i++) {
@@ -74,15 +77,22 @@ export default {
       }
 
       //cache a few pages ahead
-      BACKEND.get('search/repositories?q=language:'+this.language+'&sort=stars&order=desc&per_page='+(this.rowsPerPage * 3)+'&page='+(this.page + 2) / 3)
+      const pagesToCache = 5
+      this.loading = true
+      BACKEND.get('search/repositories?'+
+        'q=language:'+this.language+
+        '&sort=stars'+
+        '&order=desc'+
+        '&per_page='+(this.rowsPerPage * pagesToCache)+
+        '&page='+Math.ceil(this.page / pagesToCache)
+      )
       .then(res => {
         for (let i = 0; i < res.data.items.length; i++) {
-          this.cache[this.language][(this.page - 1) * this.rowsPerPage + i] = res.data.items[i]
+          let start = ((this.page - 1) - ((this.page - 1) % pagesToCache)) * this.rowsPerPage
+          this.cache[this.language][start + i] = res.data.items[i]
         }
         this.items = this.cache[this.language].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
         this.pages = Math.min(100, Math.ceil(res.data.total_count / this.rowsPerPage))
-
-        //change loading spinner to show for all loading
         this.loading = false
       })
       .catch(e => {
@@ -118,9 +128,14 @@ export default {
 
 <style lang="scss" scoped>
 .list {
+  width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 24px auto 0;
   padding: 0;
+
+  &.loading {
+    opacity: 0.5;
+  }
 }
 
 .centered {
