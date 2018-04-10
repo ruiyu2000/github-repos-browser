@@ -92,7 +92,7 @@ export default {
           this.cache[this.language][start + i] = res.data.items[i]
         }
         this.items = this.cache[this.language].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
-        this.pages = Math.min(100, Math.ceil(res.data.total_count / this.rowsPerPage))
+        this.pages = Math.min(50, Math.ceil(res.data.total_count / this.rowsPerPage)) //github seem to limit to 50 pages
         this.loading = false
       })
       .catch(e => {
