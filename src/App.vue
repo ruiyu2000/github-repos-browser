@@ -4,6 +4,7 @@
       <select slot="language" v-model="language">
         <option v-for="lang in languages" :key="lang" :value="lang">{{ lang }}</option>
       </select>
+      <input slot="search" v-model.lazy="search" type="text" placeholder="search">
     </nav-bar>
     <div v-if="loading" class="centered">
       <v-progress-circular indeterminate size="60" color="blue" />
@@ -53,7 +54,7 @@ export default {
 
   data() {
     return {
-      cache: [],
+      cache: {},
       items: [],
       language: 'JavaScript',
       languages: ['JavaScript', 'Python', 'Java', 'PHP', 'Ruby', 'C++', 'C', 'C#', 'Shell', 'HTML'],
@@ -61,7 +62,14 @@ export default {
       page: 1,
       pages: 0,
       rowsPerPage: 20,
+      search: ''
     }
+  },
+
+  computed: {
+    query() {
+      return `q=${this.search}+language:${encodeURIComponent(this.language)}&sort=stars&order=desc`
+    },
   },
 
   methods: {
@@ -69,30 +77,25 @@ export default {
       //cache lookup
       let inCache = true
       for (let i = 0; i < this.rowsPerPage; i++) {
-        if (!this.cache[this.language][i + (this.page - 1) * this.rowsPerPage]) inCache = false
+        if (!this.cache[this.query][i + (this.page - 1) * this.rowsPerPage]) inCache = false
       }
       if (inCache) {
-        this.items = this.cache[this.language].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
+        this.items = this.cache[this.query].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
         return
       }
 
       //cache a few pages ahead
       const pagesToCache = 5
       this.loading = true
-      BACKEND.get('search/repositories?'+
-        'q=language:'+this.language+
-        '&sort=stars'+
-        '&order=desc'+
-        '&per_page='+(this.rowsPerPage * pagesToCache)+
-        '&page='+Math.ceil(this.page / pagesToCache)
-      )
+
+      BACKEND.get(`search/repositories?${this.query}&per_page=${this.rowsPerPage * pagesToCache}&page=${Math.ceil(this.page / pagesToCache)}`)
       .then(res => {
         for (let i = 0; i < res.data.items.length; i++) {
           let start = ((this.page - 1) - ((this.page - 1) % pagesToCache)) * this.rowsPerPage
-          this.cache[this.language][start + i] = res.data.items[i]
+          this.cache[this.query][start + i] = res.data.items[i]
         }
-        this.items = this.cache[this.language].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
-        this.pages = Math.min(50, Math.ceil(res.data.total_count / this.rowsPerPage)) //github seem to limit to 50 pages
+        this.items = this.cache[this.query].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
+        this.pages = Math.ceil(Math.min(1000, res.data.total_count) / this.rowsPerPage) //GitHub limits search results to 1000
         this.loading = false
       })
       .catch(e => {
@@ -112,14 +115,19 @@ export default {
       this.getItems()
     },
     language: function(val) {
+      this.page = 1
+      this.cache[this.query] = this.cache[this.query] || []
+      this.getItems()
+    },
+    search: function(val) {
+      this.page = 1
+      this.cache[this.query] = this.cache[this.query] || []
       this.getItems()
     },
   },
   
   created() {
-    for (let i = 0; i < this.languages.length; i++) {
-      this.cache[this.languages[i]] = [] //create separate cache arrays for each language
-    }
+    this.cache[this.query] = this.cache[this.query] || []
     this.getItems()
   },
 }
