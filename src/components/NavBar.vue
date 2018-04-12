@@ -1,11 +1,16 @@
 <template>
   <nav class="navbar elevation-3">
     <div class="navbar-content">
-      GitHub
-      <div class="navbar-languages">
-        <slot name="language"></slot>
+      <div class="navbar-left">
+        GitHub
+        <div class="navbar-languages">
+          <slot name="language"></slot>
+        </div>
+        Repositories
       </div>
-      Repositories
+      <div class="navbar-search">
+        <slot name="search"></slot>
+      </div>
     </div>
   </nav>
 </template>
@@ -21,18 +26,24 @@ export default {
 <style lang="scss" scoped>
 .navbar {
   width: 100%;
+  padding: 0 16px;
   background-color: #24292e;
   color: white;
   font-size: 19px;
   font-weight: 500;
 
-  .navbar-content {
+  &-content {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     max-width: 1200px;
     min-height: 56px;
     margin: 0 auto;
-    padding: 0 16px;
+  }
+
+  &-left {
+    display: flex;
+    align-items: center;
 
     &:before {
       position: relative;
@@ -43,11 +54,10 @@ export default {
     }
   }
 
-  .navbar-languages {
+  &-languages {
+    align-items: center;
     position: relative;
     margin: 0 10px;
-    border-bottom: 1px solid;
-    border-radius: 0;
 
     &:after {
       position: absolute;
@@ -63,10 +73,19 @@ export default {
       width: 100%;
       padding-right: 20px;
       background: transparent;
+      border-bottom: 1px solid;
+      border-radius: 0;
 
       &:focus {
         outline: none;
       }
+    }
+  }
+
+  &-search {
+    input {
+      padding: 0 10px;
+      background: rgba(255,255,255,0.125);
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <a class="list-item" :href="url" target="_blank">
+  <a class="listitem" :href="url" target="_blank">
     <div class="image" :style="{backgroundSize: 'contain', backgroundImage: 'url('+image+')'}"></div>
     <div class="name">{{ name }}</div>
     <div class="desc">{{ description }}</div>
@@ -25,7 +25,7 @@ export default {
 
 
 <style lang="scss" scoped>
-.list-item {
+.listitem {
   display: grid;
   align-items: center;
   grid-template-columns: 7% 13% auto 8% 8%;

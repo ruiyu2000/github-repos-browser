@@ -2,7 +2,7 @@
   "name": "github-repositories-browser",
   "version": "1.0.0",
   "description": "A Vue.js project",
-  "author": "Rui Yu <rui.yu@07.no>",
+  "author": "Rui Yu <ruiyu2000@gmail.com>",
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
@@ -12,10 +12,11 @@
   "dependencies": {
     "axios": "^0.17.1",
     "vue": "^2.5.2",
-    "vuetify": "^1.0.13"
+    "vue-router": "^3.0.1",
+    "vuetify": "^1.0.14"
   },
   "devDependencies": {
-    "autoprefixer": "^7.1.2",
+    "autoprefixer": "^8.2.0",
     "babel-core": "^6.22.1",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
     "babel-loader": "^7.1.1",
