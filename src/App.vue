@@ -4,7 +4,10 @@
       <select slot="language" v-model="language">
         <option v-for="lang in languages" :key="lang" :value="lang">{{ lang }}</option>
       </select>
-      <input slot="search" v-model.lazy="search" type="text" placeholder="search">
+      <template slot="search" >
+        <input :value="search" @change="search = $event.target.value" type="text" id="search" placeholder="search">
+        <label :class="search ? 'clear' : ''" @click="search = ''" for="search" />
+      </template>
     </nav-bar>
     <div v-if="loading" class="centered">
       <v-progress-circular indeterminate size="60" color="blue" />
@@ -87,7 +90,6 @@ export default {
       //cache a few pages ahead
       const pagesToCache = 5
       this.loading = true
-
       BACKEND.get(`search/repositories?${this.query}&per_page=${this.rowsPerPage * pagesToCache}&page=${Math.ceil(this.page / pagesToCache)}`)
       .then(res => {
         for (let i = 0; i < res.data.items.length; i++) {

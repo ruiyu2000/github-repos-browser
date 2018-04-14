@@ -83,9 +83,35 @@ export default {
   }
 
   &-search {
+    display: flex;
+    background: rgba(255,255,255,0.125);
+    line-height: 30px;
+
     input {
       padding: 0 10px;
-      background: rgba(255,255,255,0.125);
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    label {
+      display: flex;
+      padding-right: 24px;
+      cursor: text;
+
+      &.clear {
+        padding: 0;
+
+        &:after {
+          position: relative;
+          font-family: 'Material Icons';
+          font-size: 24px;
+          color: lightgray;
+          content: 'clear';
+          cursor: pointer;
+        }
+      }
     }
   }
 }
