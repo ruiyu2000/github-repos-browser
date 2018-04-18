@@ -58,7 +58,7 @@ export default {
   data() {
     return {
       cache: {},
-      items: [],
+      items: [], //list items
       language: 'JavaScript',
       languages: ['JavaScript', 'Python', 'Java', 'PHP', 'Ruby', 'C++', 'C', 'C#', 'Shell', 'HTML'],
       loading: true,
@@ -77,7 +77,13 @@ export default {
 
   methods: {
     getItems() {
+      this.$router.push({
+        path: `/${encodeURIComponent(this.language)}/${this.page}/`,
+        query: this.search ? {search: this.search} : ''
+      })
+
       //cache lookup
+      this.cache[this.query] = this.cache[this.query] || []
       let inCache = true
       for (let i = 0; i < this.rowsPerPage; i++) {
         if (!this.cache[this.query][i + (this.page - 1) * this.rowsPerPage]) inCache = false
@@ -104,11 +110,6 @@ export default {
         console.log(e)
         this.loading = false
       })
-      // window.onhashchange = (e) => {
-      //   let re = /#(.*)/
-      //   this.page = parseInt(e.newURL.match(re)[1]) //need conditional to go to first page if too high
-      // }
-      // window.location.hash = '#'+this.page
     },
   },
 
@@ -117,18 +118,22 @@ export default {
       this.getItems()
     },
     language: function(val) {
-      this.page = 1
-      this.cache[this.query] = this.cache[this.query] || []
       this.getItems()
     },
     search: function(val) {
-      this.page = 1
-      this.cache[this.query] = this.cache[this.query] || []
       this.getItems()
     },
+    '$route' (to, from) {
+      this.page = to.params.page ? parseInt(to.params.page) : 1
+      this.language = to.params.language ? to.params.language : this.languages[0]
+      this.search = to.query.search ? to.query.search : ''
+    }
   },
   
   created() {
+    if (this.$route.params.page) this.page = parseInt(this.$route.params.page)
+    if (this.$route.params.language) this.language = this.$route.params.language
+    if (this.$route.query.search) this.search = this.$route.query.search
     this.cache[this.query] = this.cache[this.query] || []
     this.getItems()
   },
