@@ -1,10 +1,10 @@
 <template>
   <a class="listitem" :href="url" target="_blank">
-    <div class="image" :style="{backgroundSize: 'contain', backgroundImage: 'url('+image+')'}"></div>
+    <div class="image" :style="header ? null : {backgroundSize: 'contain', backgroundImage: 'url('+image+')'}" />
     <div class="name">{{ name }}</div>
     <div class="desc">{{ description }}</div>
-    <div class="star text-xs-right">{{ stars }}</div>
-    <div class="fork text-xs-right">{{ forks }}</div>
+    <div :class="{star: true, 'sort-down': header && sort === 'stars'}" @click="$emit('sortby', 'stars')">{{ stars }}</div>
+    <div :class="{fork: true, 'sort-down': header && sort === 'forks'}" @click="$emit('sortby', 'forks')">{{ forks }}</div>
   </a>
 </template>
 
@@ -13,6 +13,8 @@
 export default {
   name: 'list-item',
   props: {
+    header: Boolean,
+    sort: String,
     url: String,
     image: String,
     name: String,
@@ -90,6 +92,9 @@ export default {
   }
 
   .star, .fork {
+    text-align: right;
+    cursor: pointer;
+
     &:after {
       position: relative;
       left: 8px;
@@ -98,5 +103,15 @@ export default {
   }
   .star:after { content: url('.././assets/star.svg'); }
   .fork:after { content: url('.././assets/repo-forked.svg'); }
+
+  .sort-down::before {
+    position: relative;
+    top: 4px;
+    right: 6px;
+    font-family: 'Material Icons';
+    font-size: 18px;
+    line-height: 0;
+    content: 'arrow_downward';
+  }
 }
 </style>

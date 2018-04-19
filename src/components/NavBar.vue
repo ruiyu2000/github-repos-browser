@@ -97,11 +97,11 @@ export default {
 
     label {
       display: flex;
-      padding-right: 24px;
+      padding-right: 26px;
       cursor: text;
 
       &.clear {
-        padding: 0;
+        padding-right: 2px;
 
         &:after {
           position: relative;

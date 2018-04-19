@@ -18,6 +18,9 @@
       two-line
     >
       <list-item
+        header
+        :sort="sort"
+        @sortby="sort = $event"
         name='Repository'
         description='Description'
         stars='Stars'
@@ -65,13 +68,14 @@ export default {
       page: 1,
       pages: 0,
       rowsPerPage: 20,
-      search: ''
+      search: '',
+      sort: 'stars'
     }
   },
 
   computed: {
     query() {
-      return `q=${this.search}+language:${encodeURIComponent(this.language)}&sort=stars&order=desc`
+      return `q=${this.search}+language:${encodeURIComponent(this.language)}&sort=${this.sort}&order=desc`
     },
   },
 
@@ -79,14 +83,20 @@ export default {
     getItems() {
       this.$router.push({
         path: `/${encodeURIComponent(this.language)}/${this.page}/`,
-        query: this.search ? {search: this.search} : ''
+        query: {
+          ...this.search && {search: this.search},
+          ...this.sort !== 'stars' && {sort: this.sort}
+        }
       })
 
       //cache lookup
       this.cache[this.query] = this.cache[this.query] || []
       let inCache = true
       for (let i = 0; i < this.rowsPerPage; i++) {
-        if (!this.cache[this.query][i + (this.page - 1) * this.rowsPerPage]) inCache = false
+        if (!this.cache[this.query][i + (this.page - 1) * this.rowsPerPage]) {
+          inCache = false
+          break
+        }
       }
       if (inCache) {
         this.items = this.cache[this.query].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
@@ -123,17 +133,22 @@ export default {
     search: function(val) {
       this.getItems()
     },
+    sort: function(val) {
+      this.getItems()
+    },
     '$route' (to, from) {
-      this.page = to.params.page ? parseInt(to.params.page) : 1
+      this.page     = to.params.page ? parseInt(to.params.page) : 1
       this.language = to.params.language ? to.params.language : this.languages[0]
-      this.search = to.query.search ? to.query.search : ''
+      this.search   = to.query.search ? to.query.search : ''
+      this.sort     = to.query.sort ? to.query.sort : 'stars'
     }
   },
   
   created() {
-    if (this.$route.params.page) this.page = parseInt(this.$route.params.page)
+    if (this.$route.params.page)     this.page = parseInt(this.$route.params.page)
     if (this.$route.params.language) this.language = this.$route.params.language
-    if (this.$route.query.search) this.search = this.$route.query.search
+    if (this.$route.query.search)    this.search = this.$route.query.search
+    if (this.$route.query.sort)      this.sort = this.$route.query.sort
     this.cache[this.query] = this.cache[this.query] || []
     this.getItems()
   },
