@@ -1,6 +1,6 @@
 <template>
-  <a class="listitem" :href="url" target="_blank">
-    <div class="image" :style="header ? null : {backgroundSize: 'contain', backgroundImage: 'url('+image+')'}" />
+  <a class="listitem" :href="url" target="_blank" rel="noopener noreferrer">
+    <div class="image" :style="header ? null : {backgroundImage: `url(${image})`}" />
     <div class="name">{{ name }}</div>
     <div class="desc">{{ description }}</div>
     <div :class="{star: true, 'sort-down': header && sort === 'stars'}" @click="$emit('sortby', 'stars')">{{ stars }}</div>
@@ -73,6 +73,7 @@ export default {
   .image {
     width: 45px;
     height: 45px;
+    background-size: contain;
     border-radius: 3px;
   }
 
