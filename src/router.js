@@ -1,12 +1,12 @@
-import Vue from "vue"
-import VueRouter from "vue-router"
+import Vue from 'vue/dist/vue.js'
+import VueRouter from 'vue-router'
 
-Vue.use(VueRouter);
+Vue.use(VueRouter)
 
 export default new VueRouter({
   mode: 'history',
   routes: [
     { path: '/' },
-    { path: '/:language/:page(\\d+)?' },
+    { path: '/:language/:page(\\d+)?' }
   ]
 })

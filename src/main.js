@@ -1,12 +1,13 @@
-import Vue from 'vue'
-import App from './App'
+import Vue from 'vue/dist/vue.js'
+import App from './App.vue'
 import router from './router'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
+import './registerServiceWorker'
 
 Vue.use(Vuetify, {
   theme: {
-    primary: '#24292e',
+    primary: '#24292e'
   }
 })
 
