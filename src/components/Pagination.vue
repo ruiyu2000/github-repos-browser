@@ -1,7 +1,9 @@
 <template>
-  <div>
-      <a v-for="page in pages" :key="page" :href="'/#'+page" >{{page}}</a>
-  </div>
+  <ul>
+    <li v-for="page in pages" :key="page">
+      <a :href="'/'+page" >{{page}}</a>
+    </li>
+  </ul>
 </template>
 
 

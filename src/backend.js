@@ -1,7 +1,6 @@
-import Vue from "vue";
-import axios from "axios";
+import axios from 'axios'
 
 export const BACKEND = axios.create({
   baseURL: 'https://api.github.com/',
   timeout: 25000
-});
+})

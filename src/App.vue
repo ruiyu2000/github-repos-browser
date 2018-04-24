@@ -47,9 +47,9 @@
 
 <script>
 import {BACKEND} from './backend'
-import NavBar from './components/NavBar';
-import ListItem from './components/ListItem';
-// import Pagination from './components/Pagination';
+import NavBar from './components/NavBar'
+import ListItem from './components/ListItem'
+// import Pagination from './components/Pagination'
 
 export default {
   name: 'App',
@@ -58,12 +58,12 @@ export default {
     NavBar, ListItem
   },
 
-  data() {
+  data () {
     return {
       cache: {},
-      items: [], //list items
+      items: [], // list items
       language: 'JavaScript',
-      languages: ['JavaScript', 'Python', 'Java', 'PHP', 'Ruby', 'C++', 'C', 'C#', 'Shell', 'HTML'],
+      languages: ['JavaScript', 'Python', 'Java', 'PHP', 'C++', 'Go', 'TypeScript', 'C#', 'C', 'Ruby', 'Shell', 'Swift', 'Objective-C', 'Scala', 'CSS', 'Vue'],
       loading: true,
       page: 1,
       pages: 0,
@@ -74,13 +74,13 @@ export default {
   },
 
   computed: {
-    query() {
+    query () {
       return `q=${this.search}+language:${encodeURIComponent(this.language)}&sort=${this.sort}&order=desc`
-    },
+    }
   },
 
   methods: {
-    getItems() {
+    getItems () {
       this.$router.push({
         path: `/${encodeURIComponent(this.language)}/${this.page}/`,
         query: {
@@ -89,7 +89,7 @@ export default {
         }
       })
 
-      //cache lookup
+      // cache lookup
       this.cache[this.query] = this.cache[this.query] || []
       let inCache = true
       for (let i = 0; i < this.rowsPerPage; i++) {
@@ -103,55 +103,55 @@ export default {
         return
       }
 
-      //cache a few pages ahead
+      // cache a few pages ahead
       const pagesToCache = 5
       this.loading = true
       BACKEND.get(`search/repositories?${this.query}&per_page=${this.rowsPerPage * pagesToCache}&page=${Math.ceil(this.page / pagesToCache)}`)
-      .then(res => {
-        for (let i = 0; i < res.data.items.length; i++) {
-          let start = ((this.page - 1) - ((this.page - 1) % pagesToCache)) * this.rowsPerPage
-          this.cache[this.query][start + i] = res.data.items[i]
-        }
-        this.items = this.cache[this.query].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
-        this.pages = Math.ceil(Math.min(1000, res.data.total_count) / this.rowsPerPage) //GitHub limits search results to 1000
-        this.loading = false
-      })
-      .catch(e => {
-        console.log(e)
-        this.loading = false
-      })
-    },
+        .then(res => {
+          for (let i = 0; i < res.data.items.length; i++) {
+            let start = ((this.page - 1) - ((this.page - 1) % pagesToCache)) * this.rowsPerPage
+            this.cache[this.query][start + i] = res.data.items[i]
+          }
+          this.items = this.cache[this.query].slice((this.page - 1) * this.rowsPerPage, this.page * this.rowsPerPage)
+          this.pages = Math.ceil(Math.min(1000, res.data.total_count) / this.rowsPerPage) // GitHub limits search results to 1000
+          this.loading = false
+        })
+        .catch(e => {
+          console.log(e)
+          this.loading = false
+        })
+    }
   },
 
   watch: {
-    page: function(val) {
+    page: function (val) {
       this.getItems()
     },
-    language: function(val) {
+    language: function (val) {
       this.getItems()
     },
-    search: function(val) {
+    search: function (val) {
       this.getItems()
     },
-    sort: function(val) {
+    sort: function (val) {
       this.getItems()
     },
     '$route' (to, from) {
-      this.page     = to.params.page ? parseInt(to.params.page) : 1
+      this.page = to.params.page ? parseInt(to.params.page) : 1
       this.language = to.params.language ? to.params.language : this.languages[0]
-      this.search   = to.query.search ? to.query.search : ''
-      this.sort     = to.query.sort ? to.query.sort : 'stars'
+      this.search = to.query.search ? to.query.search : ''
+      this.sort = to.query.sort ? to.query.sort : 'stars'
     }
   },
-  
-  created() {
-    if (this.$route.params.page)     this.page = parseInt(this.$route.params.page)
+
+  created () {
+    if (this.$route.params.page) this.page = parseInt(this.$route.params.page)
     if (this.$route.params.language) this.language = this.$route.params.language
-    if (this.$route.query.search)    this.search = this.$route.query.search
-    if (this.$route.query.sort)      this.sort = this.$route.query.sort
+    if (this.$route.query.search) this.search = this.$route.query.search
+    if (this.$route.query.sort) this.sort = this.$route.query.sort
     this.cache[this.query] = this.cache[this.query] || []
     this.getItems()
-  },
+  }
 }
 </script>
 

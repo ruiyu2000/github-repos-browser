@@ -1,14 +1,13 @@
 <template>
   <nav class="navbar elevation-3">
-    <div class="navbar-content">
-      <div class="navbar-left">
-        GitHub
-        <div class="navbar-languages">
+    <div class="content">
+      <div class="left">
+        GitHub Repositories in
+        <div class="languages">
           <slot name="language"></slot>
         </div>
-        Repositories
       </div>
-      <div class="navbar-search">
+      <div class="search">
         <slot name="search"></slot>
       </div>
     </div>
@@ -18,7 +17,7 @@
 
 <script>
 export default {
-  name: 'NavBar'
+  name: 'nav-bar'
 }
 </script>
 
@@ -32,7 +31,7 @@ export default {
   font-size: 19px;
   font-weight: 500;
 
-  &-content {
+  .content {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -41,7 +40,7 @@ export default {
     margin: 0 auto;
   }
 
-  &-left {
+  .left {
     display: flex;
     align-items: center;
 
@@ -54,7 +53,7 @@ export default {
     }
   }
 
-  &-languages {
+  .languages {
     align-items: center;
     position: relative;
     margin: 0 10px;
@@ -82,7 +81,7 @@ export default {
     }
   }
 
-  &-search {
+  .search {
     display: flex;
     background: rgba(255,255,255,0.125);
     line-height: 30px;
